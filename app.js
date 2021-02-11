@@ -2,12 +2,22 @@
 const path = require('path');
 const bodyParser = require('body-parser');
 
+// import the error controller
+const errorController = require('./controllers/error');
+
 // add custom file in the same file that has the const requestHandler
 // const routes = require('./routes');
 
 // setting up express middleware for use
 const express = require('express');
+
 const app = express();
+
+// set your view engine
+app.set('view engine', 'ejs');
+
+// this is where you use the templating engine
+app.set('views', 'views');
 
 // add my own files
 const adminRoutes = require('./routes/admin');
@@ -29,10 +39,8 @@ app.use('/',(req, res, next) => {
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
-// add 404 error handling by adding a catch all
-app.use((req,res,next) => {
-    res.status(404).sendFile(path.join(__dirname, 'views', '404.html'))
-});
+// add 404 error handling by calling the controller 
+app.use(errorController.get404)
 
 // uses express to simplify the start server on port 3000
 app.listen(3000);
