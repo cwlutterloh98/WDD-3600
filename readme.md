@@ -1,7 +1,7 @@
 # WDD3600 
 
 Clark State Web Design and Development WDD3600 class repository.
-This project was created following the Noee.js - The Complete Guide tutorial by Maximillian Schwartmuller.
+This project was created following the Node.js - The Complete Guide tutorial by Maximillian Schwartmuller.
 This is a test of Node.js capabilities.
 
 ## Installation of npm
