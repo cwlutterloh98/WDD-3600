@@ -19,6 +19,7 @@ exports.postAddProduct = (req,res,next) => {
     const price = req.body.price;
     const description = req.body.description;
     const product = new Product(null,title,imageUrl,description,price);
+<<<<<<< HEAD
     product
         .save()
         .then(() => {
@@ -26,6 +27,10 @@ exports.postAddProduct = (req,res,next) => {
     })
     .catch(err=> console.log(err));
 
+=======
+    product.save();
+    res.redirect('/');
+>>>>>>> 5f57f7b574cb2c81bf936c68613b486c5b593c87
 };
 
 // To reach this contorl action 

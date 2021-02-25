@@ -4,6 +4,7 @@ const Cart = require('../models/cart');
 // Middleware add getProducts for shop.js
 exports.getProducts = (req, res, next) => {
     // this gives you all the products
+<<<<<<< HEAD
     Product.fetchAll()
     .then(([rows, fieldData]) => {
         // use the default templating engine and return that template and pass in data that should be added into our view
@@ -14,24 +15,44 @@ exports.getProducts = (req, res, next) => {
         })
     })
     .catch(err => console.log(err));
+=======
+    Product.fetchAll(products => {
+        // use the default templating engine and return that template and pass in data that should be added into our view
+        res.render('shop/product-list', {
+            prods: products,
+            pageTitle: 'All Products',
+            path: '/products'
+        })
+    });
+>>>>>>> 5f57f7b574cb2c81bf936c68613b486c5b593c87
 };
 
 // params object we can access our productId because we used our productId in our routes
 // render product detail
 exports.getProduct = (req,res,next) => {
     const prodId = req.params.productId
+<<<<<<< HEAD
     Product.findById(prodId).then(([product]) => {
         res.render('shop/product-detail', {
             product: product[0],
+=======
+    Product.findById(prodId, product => {
+        res.render('shop/product-detail', {
+            product: product,
+>>>>>>> 5f57f7b574cb2c81bf936c68613b486c5b593c87
             pageTitle: product.title,
             path: '/products'
         });
     })
+<<<<<<< HEAD
     .catch(err => console.log(err));
+=======
+>>>>>>> 5f57f7b574cb2c81bf936c68613b486c5b593c87
 }
 
 exports.getIndex = (req,res,next) => {
      // this gives you all the products
+<<<<<<< HEAD
      Product.fetchAll()
      // deconstruction
      .then(([rows, fieldData]) => {
@@ -45,6 +66,16 @@ exports.getIndex = (req,res,next) => {
 
     // use the default templating engine and return that template and pass in data that should be added into our view
     
+=======
+     Product.fetchAll(products => {
+        // use the default templating engine and return that template and pass in data that should be added into our view
+        res.render('shop/index', {
+            prods: products,
+            pageTitle: 'Shop',
+            path: '/'
+        })
+    });
+>>>>>>> 5f57f7b574cb2c81bf936c68613b486c5b593c87
 };
 
 exports.getCart = (req,res,next) => {
