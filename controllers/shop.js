@@ -4,39 +4,47 @@ const Cart = require('../models/cart');
 // Middleware add getProducts for shop.js
 exports.getProducts = (req, res, next) => {
     // this gives you all the products
-    Product.fetchAll(products => {
+    Product.fetchAll()
+    .then(([rows, fieldData]) => {
         // use the default templating engine and return that template and pass in data that should be added into our view
         res.render('shop/product-list', {
-            prods: products,
+            prods: rows,
             pageTitle: 'All Products',
             path: '/products'
         })
-    });
+    })
+    .catch(err => console.log(err));
 };
 
 // params object we can access our productId because we used our productId in our routes
 // render product detail
 exports.getProduct = (req,res,next) => {
     const prodId = req.params.productId
-    Product.findById(prodId, product => {
+    Product.findById(prodId).then(([product]) => {
         res.render('shop/product-detail', {
-            product: product,
+            product: product[0],
             pageTitle: product.title,
             path: '/products'
         });
     })
+    .catch(err => console.log(err));
 }
 
 exports.getIndex = (req,res,next) => {
      // this gives you all the products
-     Product.fetchAll(products => {
-        // use the default templating engine and return that template and pass in data that should be added into our view
+     Product.fetchAll()
+     // deconstruction
+     .then(([rows, fieldData]) => {
         res.render('shop/index', {
-            prods: products,
+            prods: rows,
             pageTitle: 'Shop',
             path: '/'
         })
-    });
+     })
+     .catch(err => console.log(err));
+
+    // use the default templating engine and return that template and pass in data that should be added into our view
+    
 };
 
 exports.getCart = (req,res,next) => {

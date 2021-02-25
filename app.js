@@ -5,6 +5,9 @@ const bodyParser = require('body-parser');
 // import the error controller
 const errorController = require('./controllers/error');
 
+// reach out to the database pool
+const db = require('./util/database');
+
 // add custom file in the same file that has the const requestHandler
 // const routes = require('./routes');
 
