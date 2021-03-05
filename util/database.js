@@ -1,12 +1,9 @@
-const mysql = require('mysql2');
+const Sequelize = require('sequelize');
 
-// create the connection pool which allow to always reach out to sql when we have a query to run
-const pool = mysql.createPool({
-    // define server information
-    host: 'localhost',
-    user: 'root',
-    database: 'node-complete',
-    password: 'root'
+// uses constructor function to create database connection
+const sequelize = new Sequelize('node-complete', 'root','root', {
+    dialect: 'mysql',
+    host: 'localhost'
 });
 
-module.exports = pool.promise();
+module.exports = sequelize;

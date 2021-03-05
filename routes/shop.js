@@ -28,10 +28,10 @@ router.post('/cart', shopController.postCart);
 // post request for pressing the delete button on the cart page
 router.post('/cart-delete-item', shopController.postCartDeleteProduct)
 
+// post request for createorder
+router.post('/create-order', shopController.postOrder);
+
 // get request for orders
 router.get('/orders', shopController.getOrders);
-
-// get request for checkout
-router.get('/checkout', shopController.getCheckout);
 
 module.exports = router;
