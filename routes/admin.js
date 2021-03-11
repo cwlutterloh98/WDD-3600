@@ -20,12 +20,11 @@ router.get('/products', adminController.getProducts);
 // 'post' will filter and only fire when using post requests
 router.post('/add-product', adminController.postAddProduct);
 
-// variable with a dynamic path segment indicated with a column
+// // variable with a dynamic path segment indicated with a column
 router.get('/edit-product/:productId', adminController.getEditProduct);
-
 router.post('/edit-product', adminController.postEditProduct);
 
-// don't need to put anything in the url route since you can use the body
+// // don't need to put anything in the url route since you can use the body
 router.post('/delete-product', adminController.postDeleteProduct);
 
 // seperate the exports with different syntax
