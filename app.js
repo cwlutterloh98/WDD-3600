@@ -1,12 +1,12 @@
 // nodejs core modules
 const path = require('path');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 // import the error controller
 const errorController = require('./controllers/error');
 
-// import database connection
-const mongoConnect = require('./util/database').mongoConnect;
+// import the user model
 const User = require('./models/user');
 
 // setting up express middleware for use
@@ -32,10 +32,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // incoming requests only handled by middleware
 // store the user you recieve from the database in the req
+
 app.use((req,res,next) => {
-    User.findById("60497541071745cb47e67cb9")
+    // mongoose findById
+    User.findById("6064f211477d333588f9e3cf")
     .then(user => {
-        req.user = new User(user.name, user.email, user.cart, user._id);
+        req.user = user;
         next();
     })
     .catch(err => console.log(err))
@@ -49,7 +51,27 @@ app.use(shopRoutes);
 // add 404 error handling by calling the controller 
 app.use(errorController.get404)
 
-// start application on port 3000 with database
-mongoConnect(() => {
-    app.listen(3000)
-})
+// connect to database using mongoose then start app
+mongoose
+    .connect(
+        'mongodb+srv://admin:8gnySvM515BP5ekz@cluster0.vmhsq.mongodb.net/shop?retryWrites=true&w=majority'
+    )
+    .then(result => {
+        User.findOne().then(user => {
+            // only if user is undefined not set
+            if (!user) {
+                // create user here
+                const user = new User({
+                    name: 'Max',
+                    email: 'max@test.com',
+                    cart: {
+                        items: []
+                    }
+                })
+                user.save();
+            }
+        });
+        app.listen(3000);
+    }).catch(err => {
+        console.log(err);
+    });

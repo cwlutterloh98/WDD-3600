@@ -1,10 +1,12 @@
 const Product = require('../models/product');
+const Order = require('../models/order')
 
 // Middleware add getProducts for shop.js
 exports.getProducts = (req, res, next) => {
     // this gives you all the products
-    Product.fetchAll()
+    Product.find()
     .then(products => {
+        console.log(products);
         // use the default templating engine and return that template and pass in data that should be added into our view
         res.render('shop/product-list', {
             prods: products,
@@ -20,17 +22,7 @@ exports.getProducts = (req, res, next) => {
 // render product detail
 exports.getProduct = (req,res,next) => {
     const prodId = req.params.productId;
-    // Product.findAll({where: {id: prodId}})
-    // .then(products => {
-    //     res.render('shop/product-detail', {
-    //         product: products[0],
-    //         pageTitle: products[0].title,
-    //         path: '/products'
-    //         });
-    // })
-    // .catch(err => console.log(err))
-
-    // replace findbyID with findbyPk
+    // findById is not our own method but defined by mongoose
     Product.findById(prodId)
     .then(product => {
         res.render('shop/product-detail', {
@@ -44,7 +36,7 @@ exports.getProduct = (req,res,next) => {
 
 exports.getIndex = (req,res,next) => {
      // this gives you all the products
-     Product.fetchAll()
+     Product.find()
      .then(products => {
         // use the default templating engine and return that template and pass in data that should be added into our view
         res.render('shop/index', {
@@ -60,8 +52,11 @@ exports.getIndex = (req,res,next) => {
 // get the cart to output on the cart page
 exports.getCart = (req, res, next) => {
     req.user
-      .getCart()
-      .then(products => {
+      .populate('cart.items.productId')
+      // populate does not return a promise you have to use execPopulate
+      .execPopulate()
+      .then(user => {
+        const products = user.cart.items;
         res.render('shop/cart', {
           path: '/cart',
           pageTitle: 'Your Cart',
@@ -87,7 +82,7 @@ exports.postCart = (req,res,next) => {
 exports.postCartDeleteProduct = (req,res,next) => {
     const prodId = req.body.productId;
     req.user
-    .deleteItemFromCart(prodId)
+    .removeFromCart(prodId)
     .then(result=> {
         res.redirect('/cart');
     })
@@ -96,19 +91,38 @@ exports.postCartDeleteProduct = (req,res,next) => {
 };
 
 exports.postOrder = (req, res, next) => {
-    let fetchedCart;
+    // get the products that are in the cart
     req.user
-    .addOrder()
+    .populate('cart.items.productId')
+    .execPopulate()
+    .then(user => {
+      const products = user.cart.items.map(i => {
+          // _doc method pull out all the data in the document and store it in a new object
+          return {quantity: i.quantity, product: {...i.productId._doc}}
+      });
+      // create new order based on our order model
+        const order = new Order({
+            // mongoose will automatically pull the userId from the user object
+            user: {
+                name: req.user.name,
+                userId: req.user
+            },
+            products: products
+        });
+        // saves the order to the database
+        return order.save();
+    })
     .then(result => {
+        return req.user.clearCart();
+    })
+    // moved it so that it executes only once the cart is clear
+    .then(() => {
         res.redirect('/orders')
     })
     .catch(err => console.log(err));
 };
 exports.getOrders = (req,res,next) => {
-    req.user
-    // eager loading tells sequelize to also include the products for order
-    // only works because we have a relationship between products and orders in app.js
-    .getOrders()
+    Order.find({"user.userId": req.user._id})
     .then(orders => {
         res.render('shop/orders', {
             path: '/orders',        

@@ -21,21 +21,25 @@ exports.postAddProduct = (req,res,next) => {
     const imageUrl = req.body.imageUrl;
     const price = req.body.price;
     const description = req.body.description;
-    // automatically creates a connected model
-    const product = new Product(
-        title,
-        price,
-        description,
-        imageUrl,
-        null,
-        req.user._id
-        );
-    product.save()
+    // right side of colon refers to data received in controller action
+    // left side refers to the keys in your schema
+    const product = new Product({
+        title: title,
+        price: price,
+        description: description,
+        imageUrl: imageUrl,
+        // gives access to user id and assigns it
+        userId: req.user
+    });
+    product
+    // .save() is defined by mongoose not us
+    .save()
     .then(result => {
         //console.log(result);
         console.log('created product')
         res.redirect('/admin/products');
-    }).catch(err => {
+    })
+    .catch(err => {
         console.log(err);
     });
 };
@@ -71,15 +75,19 @@ exports.postEditProduct = (req,res,next) => {
     const updatedPrice = req.body.price;
     const updatedImageUrl = req.body.imageUrl;
     const updatedDesc = req.body.description
-    const product = new Product(
-        updatedTitle,
-        updatedPrice,
-        updatedDesc,
-        updatedImageUrl,
-        new ObjectId(prodId)
-    );
-    // this affects return so the bottom catch log catches both promises
-    product.save()
+
+    // because of mongoose this is a mongoose object
+    // if you call save on an existing object it will save the object by id
+    Product.findById(prodId).then(product => {
+        product.title = updatedTitle;
+        product.price = updatedPrice;
+        product.description = updatedDesc;
+        product.imageUrl = updatedImageUrl;
+        return product
+        .save()
+    })
+
+    // this returns for the bottom catch log
     .then(result => {
         console.log('updated product')
         // moved so the new values update after update was successful
@@ -91,7 +99,12 @@ exports.postEditProduct = (req,res,next) => {
 
 exports.getProducts = (req,res,next) => {
     // this gives you all the products
-    Product.fetchAll()
+    Product.find()
+    // select can control which fields are returned
+    // .select('title price -_id')
+    // utility method to use after find
+    // gives you all the data in one step without writing nested data
+    // .populate('userId', 'name')
     .then(products => {
         res.render('admin/products', {
             prods: products,
@@ -104,8 +117,8 @@ exports.getProducts = (req,res,next) => {
 
 exports.postDeleteProduct = (req,res,next) => {
     const prodId = req.body.productId;
-    // changed to findbypk 
-    Product.deleteById(prodId)
+    // changed to findByIdAndRemove for mongoose
+    Product.findByIdAndRemove(prodId)
     .then(() => {
         console.log('destroyed product');
         res.redirect('/admin/products');
