@@ -4,8 +4,11 @@
 </head>
 
 <body>
+    
    <%- include('../includes/navigation.ejs') %>
 
+   <% //added a form to handle login with username and password %>
+   <% // uses a post requset submits with login button %>
     <main>
         <form class="login-form" action="/login" method="POST">
             <div class="form-control">
