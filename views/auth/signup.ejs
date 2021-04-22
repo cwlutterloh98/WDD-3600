@@ -4,40 +4,46 @@
 </head>
 
 <body>
-    
    <%- include('../includes/navigation.ejs') %>
 
-   <% //added a form to handle login with username and password %>
-   <% // uses a post requset submits with login button %>
     <main>
         <% if (errorMessage) { %>
             <div class="user-message user-message--error"><%= errorMessage %></div>
         <% } %>
-        <form class="login-form" action="/login" method="POST">
+
+        <form class="login-form" action="/signup" method="POST" novalidate>
             <div class="form-control">
                 <label for="email">E-Mail</label>
                 <input 
                     class="<%= validationErrors.find(e => e.param === 'email') ? 'invalid' : '' %>"
-                    type="email"
-                    name="email"
-                    id="email"
+                    type="email" 
+                    name="email" 
+                    id="email" 
                     value="<%= oldInput.email %>"
                 >
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
-                <input type="password"
+                <input 
                     class="<%= validationErrors.find(e => e.param === 'password') ? 'invalid' : '' %>"
-                    name="password"
-                    id="password" 
+                    type="password" 
+                    name="password" 
+                    id="password"  
                     value="<%= oldInput.password %>"
                 >
             </div>
+            <div class="form-control">
+                <label for="confirmPassword">Confirm Password</label>
+                <input 
+                    class="<%= validationErrors.find(e => e.param === 'confirmPassword') ? 'invalid' : '' %>"
+                    type="password" 
+                    name="confirmPassword"
+                    id="confirmPassword" 
+                    value="<%= oldInput.confirmPassword %>"
+                >
+            </div>
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <button class="btn" type="submit">Login</button>
+            <button class="btn" type="submit">Signup</button>
         </form>
-        <div class="centered">
-            <a href="/reset"> Reset Password</a>
-        </div>
     </main>
 <%- include('../includes/end.ejs') %>

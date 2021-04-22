@@ -4,6 +4,10 @@ const path = require('path');
 const express = require('express');
 
 const shopController = require('../controllers/shop');
+
+// import our middleware that checks login
+const isAuth = require('../middleware/is-auth');
+
 const router = express.Router();
 
 
@@ -20,18 +24,18 @@ router.get('/products', shopController.getProducts);
 router.get('/products/:productId', shopController.getProduct);
 
 // // get request for cart
-router.get('/cart', shopController.getCart);
+router.get('/cart', isAuth, shopController.getCart);
 
 // // post request for cart
-router.post('/cart', shopController.postCart);
+router.post('/cart', isAuth, shopController.postCart);
 
 // post request for pressing the delete button on the cart page
-router.post('/cart-delete-item', shopController.postCartDeleteProduct)
+router.post('/cart-delete-item', isAuth, shopController.postCartDeleteProduct)
 
 // // post request for createorder
-router.post('/create-order', shopController.postOrder);
+router.post('/create-order', isAuth, shopController.postOrder);
 
 // // get request for orders
-router.get('/orders', shopController.getOrders);
+router.get('/orders', isAuth, shopController.getOrders);
 
 module.exports = router;

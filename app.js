@@ -2,6 +2,8 @@
 const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const session = require('express-session');
 // have to pass the session to mongodbstore
@@ -25,6 +27,8 @@ const store = new MongoDBStore({
     collection: 'sessions'
 });
 
+// initialize protection with default settings
+const csrfProtection = csrf();
 
 // set your view engine
 app.set('view engine', 'ejs');
@@ -49,7 +53,13 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: store 
-}))
+    })
+);
+// enable csrf protection
+app.use(csrfProtection);
+
+// flash middleware is connect-flash
+app.use(flash());
 
 app.use((req,res,next) => {
     if (!req.session.user) {
@@ -65,6 +75,13 @@ app.use((req,res,next) => {
       .catch(err => console.log(err));
 });
 
+// middleware
+app.use((req, res, next) => {
+    // set local variables that are passed to the views
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+})
 // consider the routes in the admin.js and shop.js files
 // use filter so only /admin uses
 app.use('/admin', adminRoutes);
@@ -81,20 +98,7 @@ mongoose
         MONGODB_URI
     )
     .then(result => {
-        User.findOne().then(user => {
-            // only if user is undefined not set
-            if (!user) {
-                // create user here
-                const user = new User({
-                    name: 'Max',
-                    email: 'max@test.com',
-                    cart: {
-                        items: []
-                    }
-                })
-                user.save();
-            }
-        });
+        // do not need dummy user
         app.listen(3000);
     }).catch(err => {
         console.log(err);

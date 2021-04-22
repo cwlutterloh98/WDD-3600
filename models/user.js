@@ -4,14 +4,19 @@ const Schema = mongoose.Schema;
 
 // pass a javascript object to describe what the user should look like
 const userSchema = new Schema({
-    name: {
-        type: String,
-        required: true
-    },
+    // removed name
     email: {
         type: String,
         required: true
     },
+    // added password
+    password: {
+        type: String,
+        required: true
+    },
+    // tokens not required
+    resetToken: String,
+    resetTokenExpiration: Date,
     cart: {
         // this is how you create an array of documents
         items: [{
