@@ -129,8 +129,11 @@ exports.postLogin = (req, res, next) => {
       })
       
     })
-    .catch(err => console.log(err));
-  };
+    .catch(err => {
+      const error = new Error('Creating a product failed.')
+      error.httpStatusCode = 500;
+      return next(error);
+  })  };
 
 // copied form setup
 exports.postSignup = (req, res, next) => {
@@ -178,13 +181,15 @@ exports.postSignup = (req, res, next) => {
       // sendmail takes a javascript object to configure email
       return transporter.sendMail({
         to: email,
-        from: 'cwlutterloh98@hotmail.com',
+        from: 'add your email here',
         subject: 'signup succeeded',
         html: '<h1>You successfully signed up!</h1>'
       });
     })
     .catch(err => {
-      console.log(err);
+      const error = new Error('Creating a product failed.')
+      error.httpStatusCode = 500;
+      return next(error);
     })
 };
 
@@ -251,8 +256,10 @@ exports.postLogout = (req, res, next) => {
         });
       })
       .catch(err => {
-        console.log(err);
-      });
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+      })
     })
   };
 
@@ -283,9 +290,10 @@ exports.postLogout = (req, res, next) => {
       });
     })
     .catch(err => {
-      console.log(err);
-    });
-  
+      const error = new Error('Creating a product failed.')
+      error.httpStatusCode = 500;
+      return next(error);
+    })
   };
 
   exports.postNewPassword = (req, res, next) => {
@@ -319,6 +327,8 @@ exports.postLogout = (req, res, next) => {
         res.redirect('/login');
       })
       .catch(err => {
-        console.log(err);
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
       })
   }

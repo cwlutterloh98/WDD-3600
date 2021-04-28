@@ -61,6 +61,14 @@ app.use(csrfProtection);
 // flash middleware is connect-flash
 app.use(flash());
 
+// moved this token for error handling
+app.use((req, res, next) => {
+    // set local variables that are passed to the views
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+})
+
 app.use((req,res,next) => {
     if (!req.session.user) {
         return next();
@@ -68,29 +76,46 @@ app.use((req,res,next) => {
     // user is stored in session
     User.findById(req.session.user._id)
       .then(user => {
+          // so we don't store some undefined object 
+          if (!user) {
+              return next();
+          }
         // need a mongoose model to work with for cool methods
         req.user = user;
         next();
     })
-      .catch(err => console.log(err));
+    // if you would throw an error in async code 
+    .catch(err => {
+        // avoid infinite loops triggered by error handling
+        next(new Error(err));
+      });
 });
 
-// middleware
-app.use((req, res, next) => {
-    // set local variables that are passed to the views
-    res.locals.isAuthenticated = req.session.isLoggedIn;
-    res.locals.csrfToken = req.csrfToken();
-    next();
-})
+
 // consider the routes in the admin.js and shop.js files
 // use filter so only /admin uses
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
+// setup 500 error handling
+app.get('/500', errorController.get500);
 
 // add 404 error handling by calling the controller 
 app.use(errorController.get404)
+
+// special type of middleware error handling middleware
+app.use((errror, req, res,next) => {
+    // res.status(error.httpStatusCode).render(...);
+    // res.redirect('/500');
+
+    // csrf token error needs fixed
+    res.status(404).render('500',{
+        pageTitle: 'Error!',
+        path: '/500',
+        isAuthenticated: req.session.isLoggedIn
+    });
+})
 
 // connect to database using mongoose then start app
 mongoose

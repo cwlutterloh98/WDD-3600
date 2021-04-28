@@ -13,9 +13,12 @@ exports.getProducts = (req, res, next) => {
             pageTitle: 'All Products',
             path: '/products'
         })
-     }).catch(err => {
-         console.log(err);
-     });
+     })
+     .catch(err => {
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+      })
 };
 
 // params object we can access our productId because we used our productId in our routes
@@ -31,7 +34,11 @@ exports.getProduct = (req,res,next) => {
             path: '/products'
         });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+      })
 };
 
 exports.getIndex = (req,res,next) => {
@@ -44,9 +51,12 @@ exports.getIndex = (req,res,next) => {
             pageTitle: 'Shop',
             path: '/'
         })
-     }).catch(err => {
-         console.log(err);
-     });
+     })
+     .catch(err => {
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+      })
 };
 
 // get the cart to output on the cart page
@@ -63,7 +73,11 @@ exports.getCart = (req, res, next) => {
           products: products
         });
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+      })
   };
 
 // accepts a post request
@@ -86,7 +100,11 @@ exports.postCartDeleteProduct = (req,res,next) => {
     .then(result=> {
         res.redirect('/cart');
     })
-    .catch(err=> console.log(err))
+    .catch(err => {
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+      })
 
 };
 
@@ -119,7 +137,11 @@ exports.postOrder = (req, res, next) => {
     .then(() => {
         res.redirect('/orders')
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+      })
 };
 exports.getOrders = (req,res,next) => {
     Order.find({"user.userId": req.user._id})
@@ -131,5 +153,9 @@ exports.getOrders = (req,res,next) => {
             isAuthenticated: req.session.isLoggedIn
         })
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+      })
 };

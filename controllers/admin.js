@@ -35,7 +35,7 @@ exports.postAddProduct = (req,res,next) => {
         // return otherwise you continue with the rest of your code
         return res.status(422).render('admin/edit-product', {
             pageTitle: 'Add Product', 
-            path: '/admin/edit-product',
+            path: '/admin/add-product',
             editing: false,
             hasError: true,
             product: {
@@ -68,7 +68,34 @@ exports.postAddProduct = (req,res,next) => {
         res.redirect('/admin/products');
     })
     .catch(err => {
-        console.log(err);
+        // // this is a fine way to handle errors that are temporary
+        // return res.status(500).render('admin/edit-product', {
+        //     pageTitle: 'Add Product', 
+        //     path: '/admin/add-product',
+        //     editing: false,
+        //     hasError: true,
+        //     product: {
+        //         title: title,
+        //         imageUrl: imageUrl,
+        //         price: price,
+        //         description: description
+        //     },
+        //     // this should set up our displayed error message
+        //     errorMessage: 'Database operation failed, please try again.',
+        //     // set to empty because we don't want any red border
+        //     validationErrors: []
+        // });
+
+        // decent way of handling for bigger problems
+        // res.redirect('/500')
+
+        // create own error object
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+
+        // when we call next with an error passed as an argument
+        // we let express know and it skips middleware to go to erorr handler
+        return next(error);
     });
 };
 
@@ -95,7 +122,15 @@ exports.getEditProduct = (req, res, next) => {
             validationErrors: []
        });
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+        // create own error object
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+
+        // when we call next with an error passed as an argument
+        // we let express know and it skips middleware to go to erorr handler
+        return next(error);
+    })
     
 };
 
@@ -155,8 +190,11 @@ exports.postEditProduct = (req,res,next) => {
             res.redirect('/admin/products')
         })
     })
-    .catch(err => console.log(err))
-    
+    .catch(err => {
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+    })
 }
 
 exports.getProducts = (req,res,next) => {
@@ -175,8 +213,11 @@ exports.getProducts = (req,res,next) => {
             path: '/admin/products'
         });
     })
-    .catch(err => console.log(err));
-}
+    .catch(err => {
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+    })}
 
 exports.postDeleteProduct = (req,res,next) => {
     const prodId = req.body.productId;
@@ -186,5 +227,9 @@ exports.postDeleteProduct = (req,res,next) => {
         console.log('destroyed product');
         res.redirect('/admin/products');
     })
-    .catch(err=>console.log(err));
+    .catch(err => {
+        const error = new Error('Creating a product failed.')
+        error.httpStatusCode = 500;
+        return next(error);
+    })
 }
